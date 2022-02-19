@@ -13,7 +13,7 @@ boot:
 halt:
     cli
     hlt
-hello: db "Hello x86_64 page space!",0
+hello: db "Hello Arwen!",0
 
 times 510 - ($-$$) db 0
 dw 0xaa55

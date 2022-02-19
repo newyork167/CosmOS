@@ -1,3 +1,8 @@
+# Bootloader intermediary files
+bootloader/*.o
+
+# Bootloader linked files
+bootloader/*.bin
 
 # Created by https://www.toptal.com/developers/gitignore/api/c,c++,cmake,assembler,clion
 # Edit at https://www.toptal.com/developers/gitignore?templates=c,c++,cmake,assembler,clion
