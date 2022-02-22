@@ -2,53 +2,61 @@ bits 16
 org 0x7c00
 
 boot:
-    mov si,hello
+    jmp main ; jumps over utility functions
+
+print:
     mov ah,0x0e
 
-color:
+    .print_loop:
+        lodsb
+        or al,al
+        jz .return
+        int 0x10
+        jmp .print_loop
+
+    .return:
+        ret
+
+main: ; Actual start of program
+background_color:
     mov ah,0x0b
     mov bh,0x00
     mov bl,0x01
     int 0x10
 
-scroll_up:
-    mov ah,0x06
-    mov al,0x00
-    int 0x10
+write_title:
+    ; Write the title, version tagline, and kick off bootstrapping
+    mov si, ascii_title_0
+    call print
 
-    mov bx,0x10 ; 0x10 loops
-.write_pixel:
-    mov ah,0x0c
-    mov al,0x05
-    mov cx,bx
-    mov dx,bx
-    dec bx
-    int 0x10
-    or bx,bx
-    jnz .write_pixel
+    mov si, ascii_tagline
+    call print
 
-write_char:
-    mov ah,0x0a
-    mov al,0x40
-    mov cx,0x20
-    int 0x10
+    mov si, ascii_newline
+    call print
 
-load_hello:
-    mov si,hello
-    mov ah,0x0e
+    mov si, ascii_newline
+    call print
 
-.loop:
-    lodsb
-    or al,al
-    jz halt
-    int 0x10
-    jmp .loop
+    mov si, bootloading_str
+    call print
+
+    jmp halt
 
 halt:
     cli
-    hlt
+    hlt ; halt and catch fire
 
-hello: db "Hello x86_64!",0
+; string null terminators missing so it is condensed down into multiple lines
+ascii_title_0: db "_________                       ________    _________ ",13,10
+ascii_title_1: db "\_   ___ \  ____  ______ _____  \_____  \  /   _____/ ",13,10
+ascii_title_2: db "/    \  \/ /  _ \/  ___//     \  /   |   \ \_____  \  ",13,10
+ascii_title_3: db "\     \___(  <_> )___ \|  Y Y  \/    |    \/        \ ",13,10
+ascii_title_4: db " \______  /\____/____  >__|_|  /\_______  /_______  / ",13,10
+ascii_title_5: db "        \/           \/      \/         \/        \/  ",13,10,0
+ascii_tagline: db "Version: 0.0.1 (Saturn)",0
+ascii_newline: db 13,10,0
+bootloading_str: db "Going deep into the gopher hole...",0
 
 times 510 - ($-$$) db 0
 dw 0xaa55
